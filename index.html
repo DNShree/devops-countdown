@@ -6,61 +6,74 @@
   <style>
     body { font-family: monospace; max-width: 700px; margin: 40px auto; padding: 20px; background: #0d1117; color: #e6edf3; }
     h1 { color: #58a6ff; }
-    .countdown { font-size: 48px; font-weight: bold; color: #3fb950; margin: 20px 0; }
-    .day { border: 1px solid #30363d; padding: 12px; margin: 8px 0; border-radius: 6px; }
-    .day.done { border-color: #3fb950; color: #3fb950; }
-    .day.today { border-color: #f78166; background: #1c1c1c; }
-    input[type="checkbox"] { margin-right: 10px; }
-    .progress-bar { background: #21262d; border-radius: 10px; height: 12px; margin: 12px 0; }
-    .progress-fill { background: #3fb950; height: 12px; border-radius: 10px; transition: width 0.3s; }
-    .streak { color: #f0883e; font-size: 20px; margin: 10px 0; }
+    h3 { color: #8b949e; }
+    .progress-bar { background: #21262d; border-radius: 10px; height: 20px; margin: 10px 0 24px; }
+    .progress-fill { background: #3fb950; height: 20px; border-radius: 10px; transition: width 0.3s; }
+    .day { display: flex; align-items: center; gap: 12px; padding: 10px 14px; margin: 6px 0; border: 1px solid #30363d; border-radius: 6px; }
+    .day.done { border-color: #3fb950; }
+    .day.done span.title { color: #3fb950; }
+    .day-num { color: #8b949e; min-width: 55px; font-size: 13px; }
+    .title { flex: 1; }
+    button { background: #238636; color: white; border: none; padding: 5px 14px; border-radius: 6px; cursor: pointer; font-family: monospace; font-size: 13px; }
+    button:hover { background: #2ea043; }
+    .done-badge { color: #3fb950; font-size: 14px; }
+    .countdown { font-size: 42px; font-weight: bold; color: #3fb950; margin: 8px 0; }
+    .streak { color: #f0883e; font-size: 18px; margin-bottom: 16px; }
+    hr { border-color: #30363d; margin: 24px 0; }
   </style>
 </head>
 <body>
 
-  <h1>☁ DevOps Learning Countdown</h1>
-  <div class="streak" id="streak">🔥 Streak: 0 days</div>
+  <h1>🚀 DevOps 30-Day Challenge</h1>
 
-  <p>Days remaining until interview:</p>
+  <div class="streak" id="streak">🔥 Streak: 0 days</div>
+  <p style="color:#8b949e;">Days until target date:</p>
   <div class="countdown" id="countdown">--</div>
 
+  <h3 id="progressText">Progress: 0%</h3>
   <div class="progress-bar">
     <div class="progress-fill" id="progressFill" style="width: 0%"></div>
   </div>
-  <p id="progressText">0 / 15 days completed</p>
 
-  <hr style="border-color: #30363d; margin: 20px 0;">
-  <h2>📅 15-Day Plan</h2>
-
+  <hr>
   <div id="dayList"></div>
 
   <script>
     const days = [
-      "Azure Fundamentals",
-      "Networking Core",
-      "Connectivity Troubleshooting",
-      "Migration Fundamentals",
-      "Migration Tools",
-      "Migration Real Scenarios",
-      "DevOps Fundamentals",
-      "Pipelines + IaC",
-      "Containers Basics",
-      "SQL Core",
-      "SQL Troubleshooting",
-      "Monitoring",
-      "Security + Cost Optimization",
-      "Real Production Scenarios",
-      "Mock Interview + Revision"
+      "Linux Basics",
+      "Git & GitHub",
+      "Networking Fundamentals",
+      "Shell Scripting",
+      "Docker Basics",
+      "Docker Compose",
+      "Container Networking",
+      "CI/CD Concepts",
+      "GitHub Actions",
+      "AWS Basics",
+      "EC2 Deployment",
+      "Nginx Reverse Proxy",
+      "Environment Variables",
+      "Docker Volumes",
+      "Logging Concepts",
+      "Monitoring Basics",
+      "Prometheus",
+      "Grafana",
+      "Infrastructure as Code",
+      "Terraform Basics",
+      "Security Best Practices",
+      "IAM & Permissions",
+      "Load Balancing",
+      "Scaling Concepts",
+      "Kubernetes Basics",
+      "Pods & Services",
+      "Helm Basics",
+      "Blue-Green Deployment",
+      "System Design Basics",
+      "Final DevOps Project Review"
     ];
 
-    // Set your target interview date here
-    const interviewDate = new Date("2026-03-15");
-
-    function getDaysLeft() {
-      const now = new Date();
-      const diff = interviewDate - now;
-      return Math.ceil(diff / (1000 * 60 * 60 * 24));
-    }
+    // 🔧 Change this to your actual target date
+    const targetDate = new Date("2026-03-30");
 
     function getCompleted() {
       return JSON.parse(localStorage.getItem("completedDays") || "[]");
@@ -70,51 +83,55 @@
       localStorage.setItem("completedDays", JSON.stringify(arr));
     }
 
-    function getStreak() {
-      return parseInt(localStorage.getItem("streak") || "0");
+    function getDaysLeft() {
+      const diff = targetDate - new Date();
+      return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
     }
 
     function render() {
       const completed = getCompleted();
       const count = completed.length;
-      const today = new Date().getDay();
+      const pct = ((count / days.length) * 100).toFixed(0);
 
       // Countdown
       document.getElementById("countdown").textContent = getDaysLeft() + " days";
 
       // Progress
-      const pct = (count / 15) * 100;
       document.getElementById("progressFill").style.width = pct + "%";
-      document.getElementById("progressText").textContent = `${count} / 15 days completed`;
+      document.getElementById("progressText").textContent = `Progress: ${pct}% (${count} / ${days.length} completed)`;
 
       // Streak
-      document.getElementById("streak").textContent = `🔥 Streak: ${getStreak()} days`;
+      const streak = parseInt(localStorage.getItem("streak") || "0");
+      document.getElementById("streak").textContent = `🔥 Streak: ${streak} days`;
 
       // Day list
       const list = document.getElementById("dayList");
       list.innerHTML = "";
-      days.forEach((dayName, i) => {
+
+      days.forEach((title, i) => {
         const isDone = completed.includes(i);
         const div = document.createElement("div");
         div.className = "day" + (isDone ? " done" : "");
         div.innerHTML = `
-          <input type="checkbox" id="day${i}" ${isDone ? "checked" : ""} onchange="toggle(${i})">
-          <label for="day${i}">Day ${i + 1} — ${dayName}</label>
+          <span class="day-num">Day ${i + 1}</span>
+          <span class="title">${title}</span>
+          ${isDone
+            ? `<span class="done-badge">✔ Done</span>`
+            : `<button onclick="markComplete(${i})">Complete</button>`
+          }
         `;
         list.appendChild(div);
       });
     }
 
-    function toggle(index) {
+    function markComplete(index) {
       const completed = getCompleted();
-      if (completed.includes(index)) {
-        completed.splice(completed.indexOf(index), 1);
-      } else {
+      if (!completed.includes(index)) {
         completed.push(index);
-        const streak = getStreak();
+        saveCompleted(completed);
+        const streak = parseInt(localStorage.getItem("streak") || "0");
         localStorage.setItem("streak", streak + 1);
       }
-      saveCompleted(completed);
       render();
     }
 
