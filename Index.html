@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DevOps Learning Countdown</title>
+  <style>
+    body { font-family: monospace; max-width: 700px; margin: 40px auto; padding: 20px; background: #0d1117; color: #e6edf3; }
+    h1 { color: #58a6ff; }
+    .countdown { font-size: 48px; font-weight: bold; color: #3fb950; margin: 20px 0; }
+    .day { border: 1px solid #30363d; padding: 12px; margin: 8px 0; border-radius: 6px; }
+    .day.done { border-color: #3fb950; color: #3fb950; }
+    .day.today { border-color: #f78166; background: #1c1c1c; }
+    input[type="checkbox"] { margin-right: 10px; }
+    .progress-bar { background: #21262d; border-radius: 10px; height: 12px; margin: 12px 0; }
+    .progress-fill { background: #3fb950; height: 12px; border-radius: 10px; transition: width 0.3s; }
+    .streak { color: #f0883e; font-size: 20px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+
+  <h1>☁ DevOps Learning Countdown</h1>
+  <div class="streak" id="streak">🔥 Streak: 0 days</div>
+
+  <p>Days remaining until interview:</p>
+  <div class="countdown" id="countdown">--</div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+  <p id="progressText">0 / 15 days completed</p>
+
+  <hr style="border-color: #30363d; margin: 20px 0;">
+  <h2>📅 15-Day Plan</h2>
+
+  <div id="dayList"></div>
+
+  <script>
+    const days = [
+      "Azure Fundamentals",
+      "Networking Core",
+      "Connectivity Troubleshooting",
+      "Migration Fundamentals",
+      "Migration Tools",
+      "Migration Real Scenarios",
+      "DevOps Fundamentals",
+      "Pipelines + IaC",
+      "Containers Basics",
+      "SQL Core",
+      "SQL Troubleshooting",
+      "Monitoring",
+      "Security + Cost Optimization",
+      "Real Production Scenarios",
+      "Mock Interview + Revision"
+    ];
+
+    // Set your target interview date here
+    const interviewDate = new Date("2026-03-15");
+
+    function getDaysLeft() {
+      const now = new Date();
+      const diff = interviewDate - now;
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function getCompleted() {
+      return JSON.parse(localStorage.getItem("completedDays") || "[]");
+    }
+
+    function saveCompleted(arr) {
+      localStorage.setItem("completedDays", JSON.stringify(arr));
+    }
+
+    function getStreak() {
+      return parseInt(localStorage.getItem("streak") || "0");
+    }
+
+    function render() {
+      const completed = getCompleted();
+      const count = completed.length;
+      const today = new Date().getDay();
+
+      // Countdown
+      document.getElementById("countdown").textContent = getDaysLeft() + " days";
+
+      // Progress
+      const pct = (count / 15) * 100;
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("progressText").textContent = `${count} / 15 days completed`;
+
+      // Streak
+      document.getElementById("streak").textContent = `🔥 Streak: ${getStreak()} days`;
+
+      // Day list
+      const list = document.getElementById("dayList");
+      list.innerHTML = "";
+      days.forEach((dayName, i) => {
+        const isDone = completed.includes(i);
+        const div = document.createElement("div");
+        div.className = "day" + (isDone ? " done" : "");
+        div.innerHTML = `
+          <input type="checkbox" id="day${i}" ${isDone ? "checked" : ""} onchange="toggle(${i})">
+          <label for="day${i}">Day ${i + 1} — ${dayName}</label>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function toggle(index) {
+      const completed = getCompleted();
+      if (completed.includes(index)) {
+        completed.splice(completed.indexOf(index), 1);
+      } else {
+        completed.push(index);
+        const streak = getStreak();
+        localStorage.setItem("streak", streak + 1);
+      }
+      saveCompleted(completed);
+      render();
+    }
+
+    render();
+  </script>
+</body>
+</html>
